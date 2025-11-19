@@ -1,39 +1,39 @@
-# ----------------------------------------------------
-# Base Image
-# ----------------------------------------------------
-FROM python:3.10-slim
+FROM ubuntu:22.04
 
-# ----------------------------------------------------
-# Install system dependencies
-# ----------------------------------------------------
+# ------------------------------
+# System dependencies
+# ------------------------------
 RUN apt-get update && apt-get install -y \
-    libsndfile1 \
-    ffmpeg \
-    build-essential \
+    python3 python3-pip python3-dev \
+    ffmpeg libsndfile1 build-essential \
+    wget curl git \
     && rm -rf /var/lib/apt/lists/*
 
-# ----------------------------------------------------
-# Install PaddlePaddle (CPU)
-# ----------------------------------------------------
-RUN pip install --no-cache-dir paddlepaddle -i https://mirror.baidu.com/pypi/simple
+# ------------------------------
+# Install PaddlePaddle CPU
+# (استخدم PyPI الرسمي وليس الميرور الصيني)
+# ------------------------------
+RUN pip3 install --no-cache-dir paddlepaddle==2.6.1
 
-# ----------------------------------------------------
+# ------------------------------
 # Install PaddleSpeech
-# ----------------------------------------------------
-RUN pip install --no-cache-dir paddlespeech paddlespeech[server]
+# ------------------------------
+RUN pip3 install --no-cache-dir paddlespeech paddlespeech[server]
 
-# ----------------------------------------------------
-# Copy server configs
-# ----------------------------------------------------
+# ------------------------------
+# Copy config
+# ------------------------------
 WORKDIR /app
 COPY conf /app/conf
 
-# ----------------------------------------------------
-# Expose port for Railway
-# ----------------------------------------------------
+# ------------------------------
+# Expose port
+# ------------------------------
 EXPOSE 8190
 
-# ----------------------------------------------------
-# Start the realtime server
+# ------------------------------
+# Start server
+# ------------------------------
+CMD ["paddlespeech_server", "start", "--config_file", "conf/application.yaml"]# Start the realtime server
 # ----------------------------------------------------
 CMD ["paddlespeech_server", "start", "--config_file", "conf/application.yaml"]
